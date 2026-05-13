@@ -19,6 +19,7 @@ import { ClientPortal } from './pages/ClientPortal';
 import { PaymentMethodModal } from './components/PaymentMethodModal';
 import { PaymentMethod } from './types';
 import { createEmptyPaymentSummary } from './services/db';
+import { LogOut } from 'lucide-react';
 
 export function App() {
   const [dbState, setDbState] = useState(() => loadDB());
@@ -761,12 +762,23 @@ export function App() {
             </div>
 
             {currentUserType !== 'client' && (
-              <button
-                onClick={() => setShowCashModal(true)}
-                className="shrink-0 px-3 py-2 rounded-xl bg-[#1e1917] border border-[#33251d] text-[10px] font-bold text-[#e8dbd3]"
-              >
-                {currentCashRegister ? 'Caixa Aberto' : 'Abrir Caixa'}
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#1e1917] border border-[#33251d] text-[10px] font-bold text-[#e8dbd3]"
+                  title="Sair da sessão"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  Sair
+                </button>
+
+                <button
+                  onClick={() => setShowCashModal(true)}
+                  className="shrink-0 px-3 py-2 rounded-xl bg-[#1e1917] border border-[#33251d] text-[10px] font-bold text-[#e8dbd3]"
+                >
+                  {currentCashRegister ? 'Caixa Aberto' : 'Abrir Caixa'}
+                </button>
+              </div>
             )}
           </div>
 
