@@ -1,0 +1,15 @@
+{
+  "name": "NF Barber",
+  "short_name": "NF Barber",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0b0a",
+  "theme_color": "#0d0b0a",
+  "icons": [
+    {
+      "src": "/nf-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

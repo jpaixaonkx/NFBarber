@@ -705,27 +705,94 @@ export function App() {
   const shopProf = dbState.professionals.filter(p => p.barbershopId === currentBarbershopId);
   const shopProducts = dbState.products.filter(p => p.barbershopId === currentBarbershopId);
 
+  const mobileNavItems = currentUserType === 'admin'
+    ? [
+        { id: 'dashboard', label: 'Painel' },
+        { id: 'schedule', label: 'Agenda' },
+        { id: 'professionals', label: 'Equipe' },
+        { id: 'services', label: 'Servicos' },
+        { id: 'clients', label: 'Clientes' },
+        { id: 'finance', label: 'Financeiro' },
+        { id: 'marketing', label: 'IA' },
+        { id: 'notifications', label: 'Alertas' },
+      ]
+    : [
+        { id: 'dashboard', label: 'Resumo' },
+        { id: 'schedule', label: 'Agenda' },
+        { id: 'services', label: 'Precos' },
+        { id: 'finance', label: 'Comissoes' },
+        { id: 'marketing', label: 'IA' },
+      ];
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#0d0b0a]">
       {/* Sidebar Fixa */}
-      <Sidebar
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-        userType={managementUserType}
-        onLogout={handleLogout}
-        barbershopName={currentBarbershop.name}
-        userName={userNameDisplay}
-        avatarUrl={userAvatarDisplay}
-      />
+      <div className="hidden md:block">
+        <Sidebar
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          userType={managementUserType}
+          onLogout={handleLogout}
+          barbershopName={currentBarbershop.name}
+          userName={userNameDisplay}
+          avatarUrl={userAvatarDisplay}
+        />
+      </div>
 
       {/* Container Principal */}
       <div className="flex-1 flex flex-col overflow-y-auto relative">
-        <Header
-          currentCashRegister={currentCashRegister}
-          onOpenCashModal={() => setShowCashModal(true)}
-        />
+        <div className="md:block hidden">
+          <Header
+            currentCashRegister={currentCashRegister}
+            onOpenCashModal={() => setShowCashModal(true)}
+          />
+        </div>
 
-        <main className="flex-1 p-8 max-w-7xl w-full mx-auto">
+        <div className="md:hidden sticky top-0 z-30 border-b border-[#2a1f18] bg-[#0d0b0a]/95 backdrop-blur-md">
+          <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#8c6239] via-[#634427] to-[#d4af37] flex items-center justify-center font-black text-black shrink-0 shadow-lg">
+                NF
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-black text-white truncate">NF Barber</p>
+                <p className="text-[11px] text-[#a38a7a] truncate">{currentBarbershop.name}</p>
+              </div>
+            </div>
+
+            {currentUserType !== 'client' && (
+              <button
+                onClick={() => setShowCashModal(true)}
+                className="shrink-0 px-3 py-2 rounded-xl bg-[#1e1917] border border-[#33251d] text-[10px] font-bold text-[#e8dbd3]"
+              >
+                {currentCashRegister ? 'Caixa Aberto' : 'Abrir Caixa'}
+              </button>
+            )}
+          </div>
+
+          <div className="px-4 pb-3 overflow-x-auto">
+            <div className="flex gap-2 min-w-max">
+              {mobileNavItems.map(item => {
+                const active = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentTab(item.id)}
+                    className={`px-3 py-2 rounded-xl text-[11px] font-bold border transition-colors ${
+                      active
+                        ? 'bg-[#8c6239] border-[#8c6239] text-white'
+                        : 'bg-[#141110] border-[#2a1f18] text-[#bfada3]'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <main className="flex-1 px-4 py-4 md:p-8 max-w-7xl w-full mx-auto pb-28 md:pb-8">
           {renderTabContent()}
         </main>
       </div>
