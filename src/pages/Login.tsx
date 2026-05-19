@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Scissors, Building2, UserCheck, ShieldAlert } from 'lucide-react';
 import { Barbershop, Professional, Client } from '../types';
 
@@ -62,6 +62,8 @@ export const Login: React.FC<LoginProps> = ({
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regAvatar, setRegAvatar] = useState('');
+  const [isDraggingAvatar, setIsDraggingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -156,6 +158,21 @@ export const Login: React.FC<LoginProps> = ({
       phone: regPhone || '(11) 99999-9999',
       avatarUrl: regAvatar || 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&auto=format&fit=crop&q=80'
     });
+  };
+
+  const handleAvatarFile = (file?: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Envie apenas uma imagem para a foto de perfil da barbearia.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setRegAvatar(String(reader.result || ''));
+      setErrorMsg('');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -494,15 +511,57 @@ export const Login: React.FC<LoginProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase text-[#a38a7a] mb-1">URL da Foto de Perfil (Opcional)</label>
-                <input
-                  type="text"
-                  placeholder="https://..."
-                  value={regAvatar}
-                  onChange={(e) => setRegAvatar(e.target.value)}
-                  className="w-full bg-[#1b1614] border border-[#33251d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#8c6239]"
-                />
-                <span className="text-[9px] text-gray-500 block mt-0.5">Se vazio, uma foto moderna aleatória de barbearia será usada.</span>
+                <label className="block text-[11px] font-bold uppercase text-[#a38a7a] mb-1">Foto de Perfil da Barbearia</label>
+                <div
+                  onClick={() => avatarInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setIsDraggingAvatar(true); }}
+                  onDragLeave={() => setIsDraggingAvatar(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDraggingAvatar(false);
+                    handleAvatarFile(e.dataTransfer.files?.[0]);
+                  }}
+                  className={`relative cursor-pointer rounded-2xl border-2 border-dashed p-4 transition-colors ${
+                    isDraggingAvatar
+                      ? 'border-[#d4af37] bg-[#d4af37]/10'
+                      : 'border-[#33251d] bg-[#1b1614] hover:border-[#8c6239]'
+                  }`}
+                >
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleAvatarFile(e.target.files?.[0])}
+                  />
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#0d0b0a] border border-[#2a1f18] shrink-0 flex items-center justify-center">
+                      {regAvatar ? (
+                        <img src={regAvatar} alt="Preview da barbearia" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-[10px] font-black text-[#8c6239] text-center px-2">NF</div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-white">Arraste e solte a imagem aqui</p>
+                      <p className="text-[10px] text-[#a38a7a] mt-1">ou clique para selecionar do seu dispositivo</p>
+                      <p className="text-[9px] text-[#523d2f] mt-1">PNG, JPG ou JPEG. A imagem será usada como avatar da barbearia.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ou cole a URL da imagem (opcional)"
+                    value={regAvatar}
+                    onChange={(e) => setRegAvatar(e.target.value)}
+                    className="w-full bg-[#1b1614] border border-[#33251d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#8c6239]"
+                  />
+                </div>
+                <span className="text-[9px] text-gray-500 block mt-0.5">Se nada for enviado, uma imagem padrão moderna será usada.</span>
               </div>
 
               <button
